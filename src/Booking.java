@@ -1,0 +1,61 @@
+public class Booking {
+    private String requestId;
+    private String tenantId;
+    private String propertyId;
+    private String status;
+
+    public Booking(String requestId, String tenantId, String propertyId) {
+        this.requestId = requestId;
+        this.tenantId = tenantId;
+        this.propertyId = propertyId;
+        this.status = "pending";
+    }
+
+    // Getters and Setters
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public String getPropertyId() {
+        return propertyId;
+    }
+
+    public void setPropertyId(String propertyId) {
+        this.propertyId = propertyId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    // Operations
+    public void sendRequest() {
+        this.status = "pending";
+        System.out.println("Booking request sent for Property ID: " + propertyId);
+    }
+
+    public String viewStatus() {
+        return status;
+    }
+
+    public void updateStatus(String status) {
+        this.status = status;
+        System.out.println("Booking status updated to: " + status);
+    }
+}
