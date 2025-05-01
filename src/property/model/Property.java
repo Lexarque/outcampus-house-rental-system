@@ -1,15 +1,18 @@
+package property.model;
+
 public class Property {
     private String propertyId;
-    private String title;
+    private String name;
     private String location;
     private double price;
     private boolean availability;
     private String landlordId;
+    private String status = "active";
 
-    public Property(String propertyId, String title, String location, double price, boolean availability,
-            String landlordId) {
+    public Property(String propertyId, String name, String location, double price, boolean availability,
+                    String landlordId) {
         this.propertyId = propertyId;
-        this.title = title;
+        this.name = name;
         this.location = location;
         this.price = price;
         this.availability = availability;
@@ -25,12 +28,12 @@ public class Property {
         this.propertyId = propertyId;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getLocation() {
@@ -66,12 +69,23 @@ public class Property {
     }
 
     // Operations
+    public void createNewProperty(Property property) {
+        System.out.println("Successfully created new property: ");
+        System.out.println(property);
+    }
+
     public void viewDetails() {
-        System.out.println("Property ID: " + propertyId);
-        System.out.println("Title: " + title);
+        System.out.println("property.model.Property ID: " + propertyId);
+        System.out.println("Title: " + name);
         System.out.println("Location: " + location);
         System.out.println("Price: " + price);
         System.out.println("Available: " + (availability ? "Yes" : "No"));
         System.out.println("Landlord ID: " + landlordId);
+    }
+
+    @Override
+    public String toString() {
+        return "Property Id: " + propertyId + ", Title: " + name + ", Location: " + location + ", Price: " + price
+                + ", Available: " + (availability ? "Yes" : "No") + ", Landlord Id: " + landlordId;
     }
 }
