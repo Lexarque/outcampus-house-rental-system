@@ -1,9 +1,12 @@
+package user.model;
+
 public class User {
     private String userId;
     private String name;
     private String phone;
     private String password;
     private String role;
+    private String status = "pending";
 
     public User(String userId, String name, String phone, String password, String role) {
         this.userId = userId;
@@ -64,5 +67,13 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

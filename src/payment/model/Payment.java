@@ -1,3 +1,5 @@
+package payment.model;
+
 import java.util.Date;
 
 public class Payment {

@@ -1,3 +1,5 @@
+package booking.model;
+
 public class Booking {
     private String requestId;
     private String tenantId;
@@ -47,7 +49,7 @@ public class Booking {
     // Operations
     public void sendRequest() {
         this.status = "pending";
-        System.out.println("Booking request sent for Property ID: " + propertyId);
+        System.out.println("booking.model.Booking request sent for property.model.Property ID: " + propertyId);
     }
 
     public String viewStatus() {
@@ -56,6 +58,6 @@ public class Booking {
 
     public void updateStatus(String status) {
         this.status = status;
-        System.out.println("Booking status updated to: " + status);
+        System.out.println("booking.model.Booking status updated to: " + status);
     }
 }
