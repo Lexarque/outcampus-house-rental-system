@@ -4,13 +4,12 @@ public class Booking {
     private String requestId;
     private String tenantId;
     private String propertyId;
-    private String status;
+    private String status = "pending";
 
     public Booking(String requestId, String tenantId, String propertyId) {
         this.requestId = requestId;
         this.tenantId = tenantId;
         this.propertyId = propertyId;
-        this.status = "pending";
     }
 
     // Getters and Setters

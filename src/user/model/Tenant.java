@@ -10,7 +10,7 @@ public class Tenant extends  User {
     private List<Booking> bookings;
 
     public Tenant(User user) {
-        super(user.getUserId(), user.getName(), user.getPhone(), user.getPassword(), user.getRole());
+        super(user.getName(), user.getPhone(), user.getPassword(), user.getRole());
         setBookings();
     }
 
