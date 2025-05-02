@@ -9,7 +9,7 @@ public class Landlord extends User {
     private List<Property> property;
 
     public Landlord(User user) {
-        super(user.getUserId(), user.getName(), user.getPhone(), user.getPassword(), user.getRole());
+        super(user.getName(), user.getPhone(), user.getPassword(), user.getRole());
         setProperties();
     }
 
