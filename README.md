@@ -1,1 +1,3 @@
-saya suka budak ii
+To seed the project, run:
+
+`TestDataScaffold` class inside `utils/seeder` directory
