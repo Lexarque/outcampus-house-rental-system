@@ -153,7 +153,7 @@ public class PaymentSeeder {
                 if (parts.length > priceColumnIndex) {
                     String propertyId = parts[0];
                     try {
-                        System.out.println(parts[priceColumnIndex]);
+                        double price = Double.parseDouble(parts[priceColumnIndex]);
                         propertyPrices.put(propertyId, price);
                     } catch (NumberFormatException e) {
                         System.err.println("Invalid price format for property ID: " + propertyId);
