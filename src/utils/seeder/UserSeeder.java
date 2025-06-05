@@ -10,9 +10,9 @@ public class UserSeeder {
     private static final String USER_CSV_PATH = "src/file/user/users.csv";
 
     private static final String[][] users = {
-            {"John Doe", "5551234567", "password123", "ADMIN", "ACTIVE"},
-            {"Jane Smith", "5559876543", "securePass456", "LANDLORD", "ACTIVE"},
-            {"Bob Johnson", "5554567890", "bobsPassword", "TENANT", "INACTIVE"},
+            {"John Doe", "5551234567", "password123", "admin", "ACTIVE"},
+            {"Jane Smith", "5559876543", "securePass456", "landlord", "ACTIVE"},
+            {"Bob Johnson", "5554567890", "bobsPassword", "tenant", "INACTIVE"},
     };
 
     public static void seedUsers() {
