@@ -3,27 +3,114 @@ package user.model;
 import booking.model.Booking;
 import property.model.Property;
 
+import java.io.*;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class Tenant extends  User {
     private List<Booking> bookings;
 
+    public Tenant() {
+        super();
+    }
+
     public Tenant(User user) {
         super(user.getName(), user.getPhone(), user.getPassword(), user.getRole());
-        setBookings();
     }
 
     // Operations
 
-    public void searchPropertiesByName(String query) {
-        Property dummyProperty = new Property("1", "1", "1", 1.0, true, "1");
+//    public void searchPropertiesByName(String query) {
+//        Property dummyProperty = new Property("1", "1", "1", 1.0, true, "1");
+//
+//        List<Property> properties = new ArrayList<>();
+//        properties.add(dummyProperty);
+//
+//        for (Property property : properties) {
+//            System.out.println(property);
+//        }
+//    }
 
-        List<Property> properties = new ArrayList<>();
-        properties.add(dummyProperty);
+    public void register(String name, String phone, String password) {
+        try {
+            File file = new File(CSV_PATH);
+            file.getParentFile().mkdirs(); // Ensure directories exist
 
-        for (Property property : properties) {
-            System.out.println(property);
+            boolean isNewFile = !file.exists();
+            FileWriter fw = new FileWriter(file, true); // Append mode
+            BufferedWriter writer = new BufferedWriter(fw);
+
+            if (isNewFile) {
+                // Write headers if file is newly created
+                writer.write("userId,name,phone,password,role,status");
+                writer.newLine();
+            }
+
+            // Write user data
+            writer.write(String.join(",",
+                    UUID.randomUUID().toString(),
+                    name,
+                    phone,
+                    password,
+                    this.getClass().getSimpleName().toLowerCase(),
+                    "Active" // default status
+            ));
+            writer.newLine();
+            writer.close();
+
+            System.out.println(getName() + " has registered.");
+        } catch (IOException e) {
+            System.err.println("Error writing to CSV: " + e.getMessage());
+        }
+    }
+
+    public void login(String inputPhone, String inputPassword) {
+        File file = new File(CSV_PATH);
+        if (!file.exists()) {
+            System.out.println("No users registered. Please register first.");
+            return;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            boolean isFirstLine = true;
+
+            while ((line = reader.readLine()) != null) {
+                if (isFirstLine) {
+                    isFirstLine = false; // skip header
+                    continue;
+                }
+
+                String[] parts = line.split(",");
+                if (parts.length >= 5) {
+                    String phone = parts[2];
+                    String password = parts[3];
+                    String name = parts[1];
+                    String role = parts[4];
+
+                    if ((phone.equals(inputPhone) && password.equals(inputPassword)) && role.equals(this.getClass().getSimpleName().toLowerCase())) {
+
+                        // Set authenticated user's details
+                        setUserId(parts[0]);
+                        setName(name);
+                        setPhone(phone);
+                        setPassword(password);
+                        setRole(parts[4]);
+                        setStatus(parts[5]);
+
+                        System.out.println("Login successful. Welcome, " + name + "!");
+
+                        //Set bookings when login is successful
+                        setBookings();
+                        return;
+                    }
+                }
+            }
+
+            System.out.println("Login failed. Incorrect phone number or password.");
+        } catch (IOException e) {
+            System.err.println("Error reading from CSV during login: " + e.getMessage());
         }
     }
 

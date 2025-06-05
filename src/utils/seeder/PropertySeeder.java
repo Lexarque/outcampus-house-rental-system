@@ -37,7 +37,7 @@ public class PropertySeeder {
 
             if (isNewFile) {
                 // Write headers if file is newly created
-                writer.write("propertyId,name,location,price,availability,landlordId,status");
+                writer.write("propertyId,name,location,price,availability,landlordId,status,imagePath");
                 writer.newLine();
             }
 
@@ -58,7 +58,8 @@ public class PropertySeeder {
                         price,
                         availability,
                         landlordUuid,
-                        status
+                        status,
+                        "Null"
                 ));
                 writer.newLine();
             }
