@@ -18,14 +18,16 @@ public class Payment {
         recordPayment();
     }
 
-    /** Records the rent payment in the payment history */
     private void recordPayment() {
         paymentHistory.add(this);
         System.out.println("Recorded rent payment: Payment ID [" + paymentId + "], Tenant ID [" 
                 + tenantId + "], Property ID [" + propertyId + "], Amount: " + amount);
     }
 
-    /** Displays all recorded payment history */
+    public static List<Payment> getPaymentHistory() {
+        return paymentHistory;
+    }
+
     public static void trackPaymentHistory() {
         System.out.println("\nPayment History:");
         for (Payment payment : paymentHistory) {
@@ -34,39 +36,7 @@ public class Payment {
         }
     }
 
-    /** Sends a payment reminder to the tenant */
     public void sendPaymentReminder() {
-        System.out.println("Payment Reminder: Tenant [" + tenantId 
-                + "], please pay your rent for property [" + propertyId + "].");
-    }
-
-    // Getters and Setters
-
-    public String getPaymentId() { 
-        return paymentId; 
-    }
-    public void setPaymentId(String paymentId) { 
-        this.paymentId = paymentId; 
-    }
-
-    public String getTenantId() { 
-        return tenantId; 
-    }
-    public void setTenantId(String tenantId) { 
-        this.tenantId = tenantId; 
-    }
-
-    public String getPropertyId() { 
-        return propertyId; 
-    }
-    public void setPropertyId(String propertyId) { 
-        this.propertyId = propertyId; 
-    }
-
-    public double getAmount() { 
-        return amount; 
-    }
-    public void setAmount(double amount) { 
-        this.amount = amount; 
+        System.out.println("Payment Reminder: Tenant [" + tenantId + "], please pay your rent for property [" + propertyId + "].");
     }
 }
