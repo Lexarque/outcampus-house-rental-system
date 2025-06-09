@@ -1,6 +1,9 @@
 package test;
 
 import payment.model.Payment;
+import payment.model.Admin;
+import payment.model.Landlord;
+import payment.model.Tenant;
 
 public class PaymentTest {
     public static void main(String[] args) {
