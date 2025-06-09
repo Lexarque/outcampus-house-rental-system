@@ -68,7 +68,7 @@ public class AuthenticationTest {
             if (role.equalsIgnoreCase("landlord")) {
                  Landlord landlord = new Landlord();
                  landlord.login(phone, password);
-                 landlord.viewOwnListings();
+                 landlord.viewOwnListings(true);
                  landlord.postListing("Beautiful Apartment", "123 Main St", 1500, true);
             } else if (role.equalsIgnoreCase("tenant")) {
                  Tenant tenant = new Tenant();

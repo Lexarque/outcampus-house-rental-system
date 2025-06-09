@@ -1,9 +1,8 @@
 package property.model;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Property {
     private String propertyId;
@@ -31,6 +30,56 @@ public class Property {
         this.status = status;
     }
 
+    public List<Property> getPropertiesFromCsv(boolean isOnlyActive, boolean isPrintable) {
+        List<Property> properties = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(CSV_PATH))) {
+            String line;
+            boolean headerProcessed = false;
+
+            int counter = 1;
+            while ((line = reader.readLine()) != null) {
+                if (!headerProcessed) {
+                    headerProcessed = true;
+                    continue;
+                }
+
+                String[] columns = line.split(",");
+
+                if (columns.length > 0 && (!isOnlyActive || columns[6].trim().equalsIgnoreCase("active"))) {
+                    if (isPrintable) {
+                        System.out.println("Property " + counter++ + ":");
+                        System.out.println("Property ID: " + columns[0]);
+                        System.out.println("Name: " + columns[1]);
+                        System.out.println("Location: " + columns[2]);
+                        System.out.println("Price: " + columns[3]);
+                        System.out.println("Available: " + (columns[4].trim().equalsIgnoreCase("true") ? "Yes" : "No"));
+                        System.out.println("Landlord ID: " + columns[5]);
+                        System.out.println("Image Path: " + columns[6]);
+                        System.out.println("Status: " + columns[7]);
+                        System.out.println("-----------------------------");
+                    }
+
+                    // Add property to the list
+                    properties.add(new Property(
+                            columns[0].trim(),
+                            columns[1].trim(),
+                            columns[2].trim(),
+                            Double.parseDouble(columns[3].trim()),
+                            Boolean.parseBoolean(columns[4].trim()),
+                            columns[5].trim(),
+                            columns[6].trim(),
+                            columns[7].trim()
+                    ));
+                }
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error reading from CSV: " + e.getMessage());
+        }
+
+        return properties;
+    }
+
     public void saveToCsv() {
         try {
             File file = new File(CSV_PATH);
@@ -48,7 +97,47 @@ public class Property {
         }
     }
 
-    public void printLandlordProperties() {
+    public void removeFromCsv() throws IOException {
+        List<String> lines = new ArrayList<>();
+        boolean headerProcessed = false;
+
+        // Read all lines from the CSV file
+        try (BufferedReader reader = new BufferedReader(new FileReader(CSV_PATH))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (!headerProcessed) {
+                    // Keep the header line
+                    lines.add(line);
+                    headerProcessed = true;
+                } else {
+                    // Check if this line contains the property to delete
+                    String[] columns = line.split(",");
+                    if (columns.length > 0 && !columns[0].trim().equals(propertyId)) {
+                        lines.add(line);
+                    }
+                    // If it matches the propertyId, we skip adding it (basically deleting it :D)
+                }
+            }
+        }
+
+        // Write the filtered lines back to the CSV file
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(CSV_PATH))) {
+            for (String line : lines) {
+                writer.write(line);
+                writer.newLine();
+            }
+        }
+    }
+
+    public void printBasicProperties() {
+        System.out.println("Property ID: " + propertyId);
+        System.out.println("Name: " + name);
+        System.out.println("Location: " + location);
+        System.out.println("Price: " + price);
+        System.out.println("Available: " + (availability ? "Yes" : "No"));
+    }
+
+    public void printDetailedProperties() {
         System.out.println("Landlord ID: " + landlordId);
         System.out.println("Property ID: " + propertyId);
         System.out.println("Name: " + name);
@@ -121,20 +210,6 @@ public class Property {
     }
 
     // Operations
-    public void createNewProperty(Property property) {
-        System.out.println("Successfully created new property: ");
-        System.out.println(property);
-    }
-
-    public void viewDetails() {
-        System.out.println("property.model.Property ID: " + propertyId);
-        System.out.println("Title: " + name);
-        System.out.println("Location: " + location);
-        System.out.println("Price: " + price);
-        System.out.println("Available: " + (availability ? "Yes" : "No"));
-        System.out.println("Landlord ID: " + landlordId);
-    }
-
     @Override
     public String toString() {
         return "Property Id: " + propertyId + ", Title: " + name + ", Location: " + location + ", Price: " + price
