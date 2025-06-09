@@ -1,4 +1,4 @@
-package payment;
+package test;
 
 import payment.model.Payment;
 
