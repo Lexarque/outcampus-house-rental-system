@@ -15,9 +15,9 @@ public class PropertySeeder {
     private static final String USER_CSV_PATH = "src/file/user/users.csv";
 
     private static final String[][] properties = {
-            {"Sunset Apartments", "123 Main St New York NY", "2500.00", "true", "ACTIVE"},
-            {"Mountain View Condos", "456 Park Ave Boston MA", "3200.00", "true", "ACTIVE"},
-            {"Ocean Breeze Villas", "789 Beach Rd Miami FL", "4100.00", "true", "ACTIVE"},
+            {"Sunset Apartments", "123 Main St New York NY", "2500.00", "true", "active"},
+            {"Mountain View Condos", "456 Park Ave Boston MA", "3200.00", "true", "active"},
+            {"Ocean Breeze Villas", "789 Beach Rd Miami FL", "4100.00", "true", "active"},
     };
 
     public static void seedProperties() {
@@ -91,14 +91,14 @@ public class PropertySeeder {
                 String line = lines.get(i);
                 String[] parts = line.split(",");
 
-                if (parts.length >= 5 && "LANDLORD".equals(parts[4])) {
+                if (parts.length >= 5 && "landlord".equals(parts[4])) {
                     landlordUuid = parts[0];
                     break;
                 }
             }
 
             if (landlordUuid == null) {
-                System.err.println("No user with LANDLORD role found in the CSV file.");
+                System.err.println("No user with landlord role found in the CSV file.");
             }
 
         } catch (IOException e) {

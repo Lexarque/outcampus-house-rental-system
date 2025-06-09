@@ -92,7 +92,7 @@ public class BookingSeeder {
                 String line = lines.get(i);
                 String[] parts = line.split(",");
 
-                if (parts.length >= 5 && "TENANT".equals(parts[4])) {
+                if (parts.length >= 5 && "tenant".equals(parts[4])) {
                     userIds.add(parts[0]);
                 }
             }
