@@ -6,6 +6,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,9 +26,12 @@ public class ImageUploader extends JFrame {
     private JButton uploadBtn;
     private JButton clearBtn;
     private JTextField imagePathField;
+    private Runnable onCloseCallback;
 
-    public ImageUploader(String imageDir) {
-        IMAGES_DIR = imageDir;
+    public ImageUploader(String imagePath, Runnable onCloseCallback) {
+        this.onCloseCallback = onCloseCallback;
+
+        IMAGES_DIR = imagePath;
 
         setTitle("Image Upload");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -65,6 +70,17 @@ public class ImageUploader extends JFrame {
 
         // Ensure directories exist
         createDirectories();
+
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                if (onCloseCallback != null) {
+                    onCloseCallback.run();
+                }
+            }
+        });
     }
 
     private JPanel createImagePanel() {

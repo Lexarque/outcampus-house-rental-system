@@ -3,13 +3,16 @@ package user.model;
 import booking.model.Booking;
 import property.model.Property;
 
+import java.awt.print.Book;
 import java.io.*;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class Tenant extends  User {
-    private List<Booking> bookings;
+    private List<Booking> bookings = new ArrayList<>();
+
+    private static final String BOOKING_CSV_PATH = "src/file/booking/bookings.csv";
 
     public Tenant() {
         super();
@@ -97,7 +100,6 @@ public class Tenant extends  User {
                         setPhone(phone);
                         setPassword(password);
                         setRole(parts[4]);
-                        setStatus(parts[5]);
 
                         System.out.println("Login successful. Welcome, " + name + "!");
 
@@ -114,19 +116,57 @@ public class Tenant extends  User {
         }
     }
 
-    public void sendBookingRequest(Booking booking) {
-        booking.sendRequest();
+    public void sendBookingRequest(String propertyId) {
+        Booking booking = new Booking(this.getUserId(), propertyId);
+        bookings.add(booking);
+
+        //Write to booking CSV
+        booking.saveToCsv();
+
+        System.out.println("Booking request sent for property ID: " + propertyId);
     }
 
-    public void viewBookings() {
-        for (Booking booking : bookings) {
-            System.out.println(booking);
+    public void viewOwnBookings() {
+        if (bookings == null || bookings.isEmpty()) {
+            System.out.println("No bookings found for this tenant.");
+        } else {
+            System.out.println("-----------------------------------");
+            for (Booking booking : bookings) {
+                booking.printDetailedBooking();
+                System.out.println("-----------------------------------");
+            }
         }
     }
 
     private void setBookings() {
-        // Dummy booking insert
-        Booking dummyBooking = new Booking("1", "1", "1");
-        this.bookings.add(dummyBooking);
+        File file = new File(BOOKING_CSV_PATH);
+        if (!file.exists()) {
+            System.out.println("Properties not found.");
+            return;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            boolean isFirstLine = true;
+
+            while ((line = reader.readLine()) != null) {
+                if (isFirstLine) {
+                    isFirstLine = false; // skip header
+                    continue;
+                }
+
+                String[] parts = line.split(",");
+                if (parts.length >= 4) {
+                    String tenantId = parts[1];
+                    String currentUserId = getUserId();
+
+                    if (tenantId.equals(currentUserId)) {
+                        bookings.add(new Booking(parts[0], parts[1], parts[2], parts[3]));
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading from booking CSV: " + e.getMessage());
+        }
     }
 }
