@@ -1,22 +1,33 @@
-import auth.view.AuthenticationView;
+import auth.view.AuthenticationMenu;
+import user.view.landlord.LandlordMenu;
+import utils.SessionManager;
 
 import java.io.File;
-import java.util.Scanner;
 
 public class Main {
-    private static final String SESSION_FILE_CSV_DIR = "src/file/session/session.csv";
+    SessionManager sessionManager = new SessionManager();
 
     public static void main(String[] args) {
-        // Initialize the session file directory
-        File sessionFile = new File(SESSION_FILE_CSV_DIR);
-        sessionFile.getParentFile().mkdirs();
 
-        Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to Outcampus House Rentals System!");
 
-        AuthenticationView.printLoginMenu(scanner);
-        scanner.close();
+        if (AuthenticationMenu.printAuthenticationMenu() == -1) {
+            System.out.println("Exiting the system. Goodbye!");
+            return;
+        }
+
+        if (SessionManager.getCurrentUser() != null) {
+            if (SessionManager.isAdmin()) {
+                System.out.println("Welcome Admin!");
+            } else if (SessionManager.getCurrentUser().getRole().equals("landlord")) {
+                LandlordMenu.printLandlordMenu();
+            } else if (SessionManager.getCurrentUser().getRole().equals("tenant")) {
+                System.out.println("Welcome Tenant!");
+            }
+        } else {
+            System.out.println("No user logged in.");
+        }
+
+        System.out.println("Exiting the system. Goodbye!");
     }
-
-
 }

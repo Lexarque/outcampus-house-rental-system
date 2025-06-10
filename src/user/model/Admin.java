@@ -11,7 +11,7 @@ public class Admin extends User {
     }
 
     public Admin(User user) {
-        super(user.getName(), user.getPhone(), user.getPassword(), user.getRole());
+        super(user.getUserId(), user.getName(), user.getPhone(), user.getPassword(), user.getRole());
     }
 
     // empty implementation for abstract method

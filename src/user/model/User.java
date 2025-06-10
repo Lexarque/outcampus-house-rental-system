@@ -15,8 +15,8 @@ public abstract class User {
 
     public User() {}
 
-    public User(String name, String phone, String password, String role) {
-        this.userId = UUID.randomUUID().toString();
+    public User(String userId, String name, String phone, String password, String role) {
+        this.userId = userId;
         this.name = name;
         this.phone = phone;
         this.password = password;

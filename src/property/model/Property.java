@@ -87,7 +87,7 @@ public class Property {
             BufferedWriter writer = new BufferedWriter(fw);
 
             // Write user data
-            writer.write(String.join(",", propertyId, name, location, String.valueOf(price), String.valueOf(availability), landlordId, imagePath, status));
+            writer.write(String.join(",", propertyId, name, location, String.valueOf(price), String.valueOf(availability), landlordId, status, imagePath));
             writer.newLine();
             writer.close();
 

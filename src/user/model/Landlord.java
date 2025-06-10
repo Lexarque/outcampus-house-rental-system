@@ -23,8 +23,9 @@ public class Landlord extends User {
     }
 
     public Landlord(User user) {
-        super(user.getName(), user.getPhone(), user.getPassword(), user.getRole());
+        super(user.getUserId(), user.getName(), user.getPhone(), user.getPassword(), user.getRole());
         setProperties();
+        setPendingPropertyBookings();
     }
 
     // Authentication and Registration
@@ -50,8 +51,7 @@ public class Landlord extends User {
                     name,
                     phone,
                     password,
-                    this.getClass().getSimpleName().toLowerCase(),
-                    "Active" // default status
+                    this.getClass().getSimpleName().toLowerCase()
             ));
             writer.newLine();
             writer.close();
@@ -95,10 +95,7 @@ public class Landlord extends User {
                         setPassword(password);
                         setRole(parts[4]);
 
-                        // Set properties when login is successful
                         setProperties();
-
-                        // Set pending booking when login is successful
                         setPendingPropertyBookings();
 
                         System.out.println("Login successful. Welcome, " + name + "!");
@@ -137,7 +134,7 @@ public class Landlord extends User {
         Property property = new Property();
         property.setPropertyId(UUID.randomUUID().toString());
         property.setLandlordId(getUserId());
-        property.setStatus("Active");
+        property.setStatus("active");
 
         property.setName(propertyName);
         property.setLocation(location);
@@ -148,7 +145,6 @@ public class Landlord extends User {
         final ImageUploader[] uploaderRef = new ImageUploader[1];
 
         uploaderRef[0] = new ImageUploader(PROPERTY_IMAGE_PATH, () -> {
-            // Now you can access uploaderRef[0] safely
             property.setImagePath(uploaderRef[0].getImagePath());
             property.saveToCsv();
             properties.add(property);
@@ -181,15 +177,30 @@ public class Landlord extends User {
             // Remove from ArrayList
             properties.remove(propertyToDelete);
 
-            // Remove from CSV file
+            boolean imageDeleted;
+
             try {
+                // Remove from CSV file
                 propertyToDelete.removeFromCsv();
-                System.out.println("Property with ID " + propertyId + " has been deleted from both memory and CSV file.");
+
+                // Remove image file
+                String imagePath = propertyToDelete.getImagePath();
+                if (imagePath != null && !imagePath.isEmpty()) {
+                    File imageFile = new File(imagePath);
+                    if (imageFile.exists()) {
+                        imageDeleted = imageFile.delete(); // attempt to delete file
+                        if (!imageDeleted) {
+                            System.err.println("Warning: Failed to delete image file at: " + imagePath);
+                        }
+                    } else {
+                        System.out.println("Image file not found at: " + imagePath);
+                    }
+                }
+
+                System.out.println("Property with ID " + propertyId + " has been deleted from both memory and CSV.");
             } catch (Exception e) {
                 System.err.println("Error deleting property from CSV: " + e.getMessage());
-                e.printStackTrace();
-                // Add property back to the list if deletion fails
-                 properties.add(propertyToDelete);
+                properties.add(propertyToDelete);
             }
         } else {
             System.out.println("Property with ID " + propertyId + " not found.");
