@@ -19,7 +19,8 @@ public class Tenant extends  User {
     }
 
     public Tenant(User user) {
-        super(user.getName(), user.getPhone(), user.getPassword(), user.getRole());
+        super(user.getUserId(), user.getName(), user.getPhone(), user.getPassword(), user.getRole());
+        setBookings();
     }
 
     // Operations
@@ -46,7 +47,7 @@ public class Tenant extends  User {
 
             if (isNewFile) {
                 // Write headers if file is newly created
-                writer.write("userId,name,phone,password,role,status");
+                writer.write("userId,name,phone,password,role");
                 writer.newLine();
             }
 
@@ -56,8 +57,7 @@ public class Tenant extends  User {
                     name,
                     phone,
                     password,
-                    this.getClass().getSimpleName().toLowerCase(),
-                    "Active" // default status
+                    this.getClass().getSimpleName().toLowerCase()
             ));
             writer.newLine();
             writer.close();
@@ -101,10 +101,10 @@ public class Tenant extends  User {
                         setPassword(password);
                         setRole(parts[4]);
 
+                        setBookings();
+
                         System.out.println("Login successful. Welcome, " + name + "!");
 
-                        //Set bookings when login is successful
-                        setBookings();
                         return;
                     }
                 }
