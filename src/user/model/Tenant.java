@@ -74,7 +74,7 @@ public class Tenant extends  User {
             writer.newLine();
             writer.close();
 
-            System.out.println(getName() + " has registered.");
+            System.out.println(name + " has registered.");
         } catch (IOException e) {
             System.err.println("Error writing to CSV: " + e.getMessage());
         }
@@ -129,7 +129,7 @@ public class Tenant extends  User {
     }
 
     public void sendBookingRequest(String propertyId) {
-        Booking booking = new Booking(this.getUserId(), propertyId);
+        Booking booking = new Booking(UUID.randomUUID().toString(), this.getUserId(), propertyId, "pending");
         bookings.add(booking);
 
         //Write to booking CSV

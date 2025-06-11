@@ -93,6 +93,9 @@ public class LandlordMenu {
 
     private static void updateBookingStatus() {
         landlord.viewPendingBookings();
+        if (landlord.getPendingPropertyBookings() == null || landlord.getPendingPropertyBookings().isEmpty()) {
+            return;
+        }
         System.out.print("Choose the booking number to approve/reject: ");
         int bookingNumber = Integer.parseInt(scanner.nextLine());
         String bookingId = landlord.getPendingPropertyBookings().get(bookingNumber - 1).getRequestId();

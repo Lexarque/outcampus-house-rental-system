@@ -56,7 +56,7 @@ public class Landlord extends User {
             writer.newLine();
             writer.close();
 
-            System.out.println(getName() + " has registered.");
+            System.out.println(name + " has registered.");
         } catch (IOException e) {
             System.err.println("Error writing to CSV: " + e.getMessage());
         }
