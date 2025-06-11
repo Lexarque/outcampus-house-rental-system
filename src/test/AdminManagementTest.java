@@ -28,7 +28,6 @@ public class AdminManagementTest {
             case 2 -> admin.readAllProperties();
             case 3 -> removeUserTest();
             case 4 -> deactivatePropertyTest();
-            case 5 -> changeUserStatusTest();
             default -> System.out.println("Invalid option!");
         }
     }
@@ -43,13 +42,5 @@ public class AdminManagementTest {
         System.out.print("Enter the Property Name to deactivate: ");
         String propertyId = scanner.nextLine();
         admin.deactivateProperty(propertyId);
-    }
-
-    private static void changeUserStatusTest() {
-        System.out.print("Enter the User ID: ");
-        String userId = scanner.nextLine();
-        System.out.print("Enter new status (accepted/rejected): ");
-        String status = scanner.nextLine();
-        admin.changeUserStatus(userId, status);
     }
 }

@@ -1,6 +1,8 @@
 package test;
 
 import payment.model.Payment;
+
+import java.time.LocalDate;
 import java.util.*;
 
 public class PaymentTest {
@@ -35,10 +37,9 @@ public class PaymentTest {
                     double amount = scanner.nextDouble();
                     scanner.nextLine();
                     String paymentId = UUID.randomUUID().toString();
-                    Date date = new Date();
-                    new Payment(paymentId, tenantId, propertyId, amount, date);
+                    new Payment(paymentId, tenantId, propertyId, amount, LocalDate.now());
                 } else if (tenantAction == 2) {
-                    Payment.trackPaymentHistory();
+//                    Payment.trackPaymentHistory();
                 } else {
                     System.out.println("Invalid action.");
                 }
@@ -55,7 +56,7 @@ public class PaymentTest {
 
             case 3:
                 System.out.println("\nLogged in as Admin [" + adminId + "]");
-                Payment.trackPaymentHistory();
+//                Payment.trackPaymentHistory();
                 break;
 
             default:

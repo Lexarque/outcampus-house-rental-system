@@ -45,7 +45,11 @@ public class BookingTest {
     }
 
     private static void requestBookingTest() {
-        List<Property> activeProperties = property.getPropertiesFromCsv(true, true);
+        List<Property> activeProperties = property.getPropertiesFromCsv(true);
+        for (int i = 0; i < activeProperties.size(); i++) {
+            System.out.println("Property " + (i + 1));
+            activeProperties.get(i).printBasicProperties();
+        }
         System.out.print("Choose the property number make a booking request: ");
         int propertyNumber = Integer.parseInt(scanner.nextLine());
         String propertyId = activeProperties.get(propertyNumber - 1).getPropertyId();
