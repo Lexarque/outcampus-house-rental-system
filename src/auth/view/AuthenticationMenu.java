@@ -68,6 +68,7 @@ public class AuthenticationMenu {
                 Admin admin = new Admin();
                 admin.login(phone, password);
                 SessionManager.setCurrentUser(admin);
+                break;
             case "landlord":
                 Landlord landlord = new Landlord();
                 landlord.login(phone, password);

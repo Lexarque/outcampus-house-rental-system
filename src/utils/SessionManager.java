@@ -32,8 +32,13 @@ public class SessionManager {
         }
     }
 
-    public static boolean isAdmin() {
-        return currentUser instanceof Admin;
+    public static Admin setAdminData() {
+        if (currentUser instanceof Admin) {
+            return new Admin(currentUser);
+        } else {
+            System.err.println("Current user is not an Admin.");
+            return null;
+        }
     }
 
     public static void setCurrentUser(User user) {

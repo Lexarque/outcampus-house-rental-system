@@ -18,14 +18,13 @@ public class AdminManagementTest {
                 2. View All Properties
                 3. Remove a User
                 4. Deactivate a Property
-                5. Change User Status
                 Choose option (1-5):\s""");
 
         int option = Integer.parseInt(scanner.nextLine());
 
         switch (option) {
             case 1 -> admin.readAllUsers();
-            case 2 -> admin.readAllProperties();
+            case 2 -> admin.readAllProperties(false);
             case 3 -> removeUserTest();
             case 4 -> deactivatePropertyTest();
             default -> System.out.println("Invalid option!");
