@@ -20,7 +20,11 @@ public class LandlordMenu {
                 
                 4. Delete Listing\
                 
-                5. Exit\
+                5. View Pending Bookings\
+                
+                6. Accept or Reject Booking\
+                
+                7. Exit\
                 
                 : \s""");
             int option = Integer.parseInt(scanner.nextLine());
@@ -39,6 +43,12 @@ public class LandlordMenu {
                     deleteListing();
                     break;
                 case 5:
+                    landlord.viewPendingBookings();
+                    break;
+                case 6:
+                    updateBookingStatus();
+                    break;
+                case 7:
                     return;
                 default:
                     System.out.println("Invalid option!");
@@ -79,5 +89,15 @@ public class LandlordMenu {
         int propertyNumber = Integer.parseInt(scanner.nextLine());
         String propertyId = landlord.getProperties().get(propertyNumber - 1).getPropertyId();
         landlord.deleteListing(propertyId);
+    }
+
+    private static void updateBookingStatus() {
+        landlord.viewPendingBookings();
+        System.out.print("Choose the booking number to approve/reject: ");
+        int bookingNumber = Integer.parseInt(scanner.nextLine());
+        String bookingId = landlord.getPendingPropertyBookings().get(bookingNumber - 1).getRequestId();
+        System.out.print("Enter new status (accepted/rejected): ");
+        String newStatus = scanner.nextLine();
+        landlord.updateBookingStatus(bookingId, newStatus);
     }
 }

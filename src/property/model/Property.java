@@ -30,7 +30,7 @@ public class Property {
         this.status = status;
     }
 
-    public List<Property> getPropertiesFromCsv(boolean isOnlyActive, boolean isPrintable) {
+    public List<Property> getPropertiesFromCsv(boolean isOnlyActive) {
         List<Property> properties = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(CSV_PATH))) {
             String line;
@@ -46,18 +46,6 @@ public class Property {
                 String[] columns = line.split(",");
 
                 if (columns.length > 0 && (!isOnlyActive || columns[6].trim().equalsIgnoreCase("active"))) {
-                    if (isPrintable) {
-                        System.out.println("Property " + counter++ + ":");
-                        System.out.println("Property ID: " + columns[0]);
-                        System.out.println("Name: " + columns[1]);
-                        System.out.println("Location: " + columns[2]);
-                        System.out.println("Price: " + columns[3]);
-                        System.out.println("Available: " + (columns[4].trim().equalsIgnoreCase("true") ? "Yes" : "No"));
-                        System.out.println("Landlord ID: " + columns[5]);
-                        System.out.println("Image Path: " + columns[6]);
-                        System.out.println("Status: " + columns[7]);
-                        System.out.println("-----------------------------");
-                    }
 
                     // Add property to the list
                     properties.add(new Property(

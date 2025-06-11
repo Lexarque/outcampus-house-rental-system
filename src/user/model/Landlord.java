@@ -320,6 +320,7 @@ public class Landlord extends User {
                 if (columns.length > idColumnIndex && columns[idColumnIndex].trim().equals(id)) {
                     // Found the row to update
                     if (columns.length > targetColumnIndex) {
+                        pendingPropertyBookings.removeIf(booking -> booking.getRequestId().equals(id));
                         columns[targetColumnIndex] = newValue;
                         lines.add(String.join(",", columns));
                         updated = true;
