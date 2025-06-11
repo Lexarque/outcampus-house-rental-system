@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class PaymentSeeder {
@@ -15,7 +16,7 @@ public class PaymentSeeder {
     private static final String BOOKING_CSV_PATH = "src/file/booking/bookings.csv";
     private static final String PAYMENT_CSV_PATH = "src/file/payment/payments.csv";
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public static void seedPayments() {
         List<String[]> acceptedBookings = getBookingsByStatus("accepted");
@@ -24,7 +25,6 @@ public class PaymentSeeder {
             return;
         }
 
-        // Get property information to determine payment amounts
         Map<String, Double> propertyPrices = getPropertyPrices();
         if (propertyPrices.isEmpty()) {
             System.err.println("Cannot seed payments without property price information.");
@@ -33,44 +33,36 @@ public class PaymentSeeder {
 
         try {
             File file = new File(PAYMENT_CSV_PATH);
-            file.getParentFile().mkdirs(); // Ensure directories exist
+            file.getParentFile().mkdirs();
 
             boolean isNewFile = !file.exists();
-            FileWriter fw = new FileWriter(file, true); // Append mode
+            FileWriter fw = new FileWriter(file, true);
             BufferedWriter writer = new BufferedWriter(fw);
 
             if (isNewFile) {
-                // Write headers if file is newly created
                 writer.write("paymentId,tenantId,propertyId,amount,date");
                 writer.newLine();
             }
 
             Random random = new Random();
-            Calendar calendar = Calendar.getInstance();
 
-            // Create payments based on accepted bookings
             for (String[] booking : acceptedBookings) {
                 String tenantId = booking[1];
                 String propertyId = booking[2];
-
-                // Generate payment details
                 String paymentId = UUID.randomUUID().toString();
-
-                // Get property price if available, otherwise use a random amount
                 double amount = propertyPrices.getOrDefault(propertyId, 1000.0 + random.nextDouble() * 4000.0);
 
-                // Generate a random date within the last 6 months
-                calendar.setTime(new Date());
-                calendar.add(Calendar.MONTH, -random.nextInt(6));
-                calendar.add(Calendar.DAY_OF_MONTH, -random.nextInt(30));
-                String paymentDate = DATE_FORMAT.format(calendar.getTime());
+                // Generate a random LocalDate within the last 6 months
+                int randomMonths = random.nextInt(6);
+                int randomDays = random.nextInt(30);
+                LocalDate paymentDate = LocalDate.now().minusMonths(randomMonths).minusDays(randomDays);
 
                 writer.write(String.join(",",
                         paymentId,
                         tenantId,
                         propertyId,
-                        String.format("%.2f", amount),
-                        paymentDate
+                        String.valueOf(amount),
+                        paymentDate.format(DATE_FORMAT)
                 ));
                 writer.newLine();
             }
@@ -83,30 +75,27 @@ public class PaymentSeeder {
 
     private static List<String[]> getBookingsByStatus(String status) {
         List<String[]> bookings = new ArrayList<>();
-        java.nio.file.Path path = java.nio.file.Paths.get(BOOKING_CSV_PATH);
+        Path path = Paths.get(BOOKING_CSV_PATH);
 
         try {
-            if (!java.nio.file.Files.exists(path)) {
+            if (!Files.exists(path)) {
                 System.err.println("Bookings CSV file does not exist.");
                 return bookings;
             }
 
-            java.util.List<String> lines = java.nio.file.Files.readAllLines(path);
+            List<String> lines = Files.readAllLines(path);
             if (lines.size() <= 1) {
                 System.err.println("Bookings CSV file is empty or contains only headers.");
                 return bookings;
             }
 
-            // Skip the header line
             for (int i = 1; i < lines.size(); i++) {
                 String line = lines.get(i);
                 String[] parts = line.split(",");
-
                 if (parts.length >= 4 && status.equals(parts[3])) {
                     bookings.add(parts);
                 }
             }
-
         } catch (IOException e) {
             System.err.println("Error reading CSV file: " + e.getMessage());
         }
@@ -124,13 +113,12 @@ public class PaymentSeeder {
                 return propertyPrices;
             }
 
-            java.util.List<String> lines = Files.readAllLines(path);
+            List<String> lines = Files.readAllLines(path);
             if (lines.size() <= 1) {
                 System.err.println("Properties CSV file is empty or contains only headers.");
                 return propertyPrices;
             }
 
-            // Skip the header line and look for the price column index
             String[] headers = lines.get(0).split(",");
             int priceColumnIndex = -1;
             for (int i = 0; i < headers.length; i++) {
@@ -145,11 +133,9 @@ public class PaymentSeeder {
                 return propertyPrices;
             }
 
-            // Process each property line
             for (int i = 1; i < lines.size(); i++) {
                 String line = lines.get(i);
                 String[] parts = line.split(",");
-
                 if (parts.length > priceColumnIndex) {
                     String propertyId = parts[0];
                     try {

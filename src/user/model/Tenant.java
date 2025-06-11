@@ -1,18 +1,22 @@
 package user.model;
 
 import booking.model.Booking;
+import payment.model.Payment;
 import property.model.Property;
 
 import java.awt.print.Book;
 import java.io.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class Tenant extends  User {
     private List<Booking> bookings = new ArrayList<>();
+    private List<Payment> payments = new ArrayList<>();
 
     private static final String BOOKING_CSV_PATH = "src/file/booking/bookings.csv";
+    private static final String PAYMENT_CSV_PATH = "src/file/payment/payments.csv";
 
     public Tenant() {
         super();
@@ -21,20 +25,28 @@ public class Tenant extends  User {
     public Tenant(User user) {
         super(user.getUserId(), user.getName(), user.getPhone(), user.getPassword(), user.getRole());
         setBookings();
+        Payment.setPaymentHistory(getUserId(), payments);
     }
 
     // Operations
 
-//    public void searchPropertiesByName(String query) {
-//        Property dummyProperty = new Property("1", "1", "1", 1.0, true, "1");
-//
-//        List<Property> properties = new ArrayList<>();
-//        properties.add(dummyProperty);
-//
-//        for (Property property : properties) {
-//            System.out.println(property);
-//        }
-//    }
+    public List<Property> filterActivePropertyByPrice(List<Property> activeProperties, double minPrice, double maxPrice) {
+        List<Property> filteredProperties = new ArrayList<>();
+
+        for (Property property : activeProperties) {
+            if (property.getPrice() >= minPrice && property.getPrice() <= maxPrice) {
+                filteredProperties.add(property);
+            }
+        }
+
+        if (filteredProperties.isEmpty()) {
+            System.out.println("No properties found in the specified price range.");
+        } else {
+            return filteredProperties;
+        }
+
+        return null;
+    }
 
     public void register(String name, String phone, String password) {
         try {
@@ -167,6 +179,81 @@ public class Tenant extends  User {
             }
         } catch (IOException e) {
             System.err.println("Error reading from booking CSV: " + e.getMessage());
+        }
+    }
+
+    public List<String> getAcceptedBookingPropertyIds() {
+        List<String> acceptedPropertyIds = new ArrayList<>();
+        for (Booking booking : bookings) {
+            if ("accepted".equalsIgnoreCase(booking.getStatus()) && !acceptedPropertyIds.contains(booking.getPropertyId())) {
+                acceptedPropertyIds.add(booking.getPropertyId());
+            }
+        }
+
+        if (acceptedPropertyIds.isEmpty()) {
+            System.out.println("No accepted bookings found.");
+        } else {
+            return acceptedPropertyIds;
+        }
+
+        return null;
+    }
+
+    // Payment
+
+    public void viewOwnPayments() {
+        if (payments == null || payments.isEmpty()) {
+            System.out.println("No payments found for this tenant.");
+        } else {
+            System.out.println("-----------------------------------");
+            for (Payment payment : payments) {
+                payment.printBasicPayments();
+                System.out.println("-----------------------------------");
+            }
+        }
+    }
+
+    public boolean getPaymentStatusForSelectedMonth(int month, String propertyId) {
+        for (Payment payment : payments) {
+            if (payment.getDate().getMonthValue() == month && payment.getPropertyId().equals(propertyId)) {
+                System.out.println("Payment found");
+                payment.printBasicPayments();
+                return true;
+            }
+        }
+        System.out.println("No payments found for the selected month and property ID.");
+        return false;
+    }
+
+    public void payForTheSelectedMonth(int month, String propertyId, double amount) {
+        boolean isPaymentFound = getPaymentStatusForSelectedMonth(month, propertyId);
+
+        if (isPaymentFound) {
+            System.out.println("Payment has already been made for this month!");
+            return;
+        }
+
+        File file = new File(PAYMENT_CSV_PATH);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+            String paymentId = UUID.randomUUID().toString();
+            Payment payment = new Payment(paymentId, getUserId(), propertyId, amount, LocalDate.now());
+
+            writer.write(String.join(",",
+                    payment.getPaymentId(),
+                    payment.getTenantId(),
+                    payment.getPropertyId(),
+                    String.valueOf(payment.getAmount()),
+                    payment.getDate().toString()
+            ));
+
+            writer.newLine();
+
+            // Add new payment
+            payments.add(payment);
+
+            System.out.println("Payment recorded successfully for month: " + month + ", property id: " + propertyId);
+        } catch (IOException e) {
+            System.err.println("Error writing to payment CSV: " + e.getMessage());
         }
     }
 }

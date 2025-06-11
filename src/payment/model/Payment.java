@@ -1,5 +1,9 @@
 package payment.model;
 
+import property.model.Property;
+
+import java.io.*;
+import java.time.LocalDate;
 import java.util.*;
 
 public class Payment {
@@ -8,36 +12,80 @@ public class Payment {
     private String tenantId;
     private String propertyId;
     private double amount;
-    private Date date;
-    private static List<Payment> paymentHistory = new ArrayList<>();
+    private LocalDate date;
 
-    public Payment(String paymentId, String tenantId, String propertyId, double amount, Date date) {
+    private static final String PAYMENT_CSV_PATH = "src/file/payment/payments.csv";
+
+    public Payment() {}
+
+    public Payment(String paymentId, String tenantId, String propertyId, double amount, LocalDate date) {
         this.paymentId = paymentId;
         this.tenantId = tenantId;
         this.propertyId = propertyId;
         this.amount = amount;
         this.date = date;
-        recordPayment();
     }
 
-    private void recordPayment() {
-        paymentHistory.add(this);
-        System.out.println("Recorded payment: Payment ID [" + paymentId + "], Tenant ID [" + tenantId +
-                "], Property ID [" + propertyId + "], Amount: RM" + amount + ", Date: " + date);
-    }
+    public static void setPaymentHistory(String tenantId, List<Payment> paymentHistory) {
+        File file = new File(PAYMENT_CSV_PATH);
+        if (!file.exists()) {
+            System.out.println("Payment history file does not exist.");
+            return;
+        }
 
-    public static void trackPaymentHistory() {
-        System.out.println("\nPayment History:");
-        for (Payment payment : paymentHistory) {
-            System.out.println("Payment ID [" + payment.paymentId + "], Tenant ID [" + payment.tenantId +
-                    "], Property ID [" + payment.propertyId + "], Amount: RM" + payment.amount + ", Date: "
-                    + payment.date);
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            boolean isFirstLine = true;
+
+            while ((line = reader.readLine()) != null) {
+                if (isFirstLine) {
+                    isFirstLine = false; // skip header
+                    continue;
+                }
+
+                String[] parts = line.split(",");
+                if (parts.length >= 5) {
+                    String paymentTenantId = parts[1];
+
+                    if (paymentTenantId.equals(tenantId)) {
+                        paymentHistory.add(new Payment(parts[0], parts[1], parts[2], Double.parseDouble(parts[3]), LocalDate.parse(parts[4])));
+
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading payment history: " + e.getMessage());
         }
     }
+
+    public void recordPayment(List<Payment> paymentHistory) {
+        paymentHistory.add(this);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(PAYMENT_CSV_PATH, true))) {
+            writer.write(String.join(",", paymentId, tenantId, propertyId, String.valueOf(amount), date.toString()));
+            writer.newLine();
+        } catch (Exception e) {
+            System.err.println("Error recording payment: " + e.getMessage());
+        }
+    }
+
+//    public static void trackPaymentHistory() {
+//        System.out.println("\nPayment History:");
+//        for (Payment payment : paymentHistory) {
+//            System.out.println("Payment ID [" + payment.paymentId + "], Tenant ID [" + payment.tenantId +
+//                    "], Property ID [" + payment.propertyId + "], Amount: RM" + payment.amount + ", Date: "
+//                    + payment.date);
+//        }
+//    }
 
     public static void sendReminder(String tenantId, String propertyId) {
         System.out.println(
                 "Payment Reminder: Tenant [" + tenantId + "], please pay your rent for property [" + propertyId + "].");
+    }
+
+    public void printBasicPayments() {
+        System.out.println("Property ID: " + propertyId);
+        System.out.println("Amount: RM" + amount);
+        System.out.println("Date: " + date);
     }
 
     // Getters and Setters
@@ -73,11 +121,11 @@ public class Payment {
         this.amount = amount;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 }

@@ -1,12 +1,11 @@
 import auth.view.AuthenticationMenu;
 import user.view.landlord.LandlordMenu;
+import user.view.tenant.TenantMenu;
 import utils.SessionManager;
 
 import java.io.File;
 
 public class Main {
-    SessionManager sessionManager = new SessionManager();
-
     public static void main(String[] args) {
 
         System.out.println("Welcome to Outcampus House Rentals System!");
@@ -22,7 +21,7 @@ public class Main {
             } else if (SessionManager.getCurrentUser().getRole().equals("landlord")) {
                 LandlordMenu.printLandlordMenu();
             } else if (SessionManager.getCurrentUser().getRole().equals("tenant")) {
-                System.out.println("Welcome Tenant!");
+                TenantMenu.printTenantMenu();
             }
         } else {
             System.out.println("No user logged in.");
