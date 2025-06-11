@@ -9,7 +9,6 @@ public abstract class User {
     private String phone;
     private String password;
     private String role;
-    private String status = "pending";
 
     protected static final String CSV_PATH = "src/file/user/users.csv";
 
@@ -73,13 +72,5 @@ public abstract class User {
 
     public String getCSVPath() {
         return CSV_PATH;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 }
