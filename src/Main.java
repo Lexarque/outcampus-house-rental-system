@@ -1,9 +1,8 @@
 import auth.view.AuthenticationMenu;
+import user.view.admin.AdminMenu;
 import user.view.landlord.LandlordMenu;
 import user.view.tenant.TenantMenu;
 import utils.SessionManager;
-
-import java.io.File;
 
 public class Main {
     public static void main(String[] args) {
@@ -16,12 +15,10 @@ public class Main {
         }
 
         if (SessionManager.getCurrentUser() != null) {
-            if (SessionManager.isAdmin()) {
-                System.out.println("Welcome Admin!");
-            } else if (SessionManager.getCurrentUser().getRole().equals("landlord")) {
-                LandlordMenu.printLandlordMenu();
-            } else if (SessionManager.getCurrentUser().getRole().equals("tenant")) {
-                TenantMenu.printTenantMenu();
+            switch (SessionManager.getCurrentUser().getRole()) {
+                case "admin" -> AdminMenu.printAdminMenu();
+                case "landlord" -> LandlordMenu.printLandlordMenu();
+                case "tenant" -> TenantMenu.printTenantMenu();
             }
         } else {
             System.out.println("No user logged in.");

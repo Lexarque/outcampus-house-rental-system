@@ -48,7 +48,14 @@ public class Admin extends User {
                     String role = parts[4];
 
                     if (phone.equals(inputPhone) && password.equals(inputPassword)) {
-                        System.out.println("Welcome " + name + " (" + role + ")");
+                        // Set authenticated user's details'
+                        setUserId(parts[0]);
+                        setName(name);
+                        setPhone(phone);
+                        setPassword(password);
+                        setRole(parts[4]);
+
+                        System.out.println("Login successful. Welcome, Admin " + name + "!");
                         return; // successful login
                     }
                 }
@@ -89,7 +96,7 @@ public class Admin extends User {
         }
     }
 
-    public void readAllProperties() {
+    public void readAllProperties(boolean onlyActive) {
         File propertyFile = new File("src/file/property/properties.csv");
         File userFile = new File("src/file/user/users.csv");
 
@@ -129,7 +136,7 @@ public class Admin extends User {
                 }
 
                 String[] parts = propLine.split(",");
-                if (parts.length >= 8) {
+                if (parts.length >= 8 && (!onlyActive || parts[6].equalsIgnoreCase("active"))) {
                     String name = parts[1];
                     String location = parts[2];
                     String price = parts[3];
