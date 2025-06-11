@@ -13,11 +13,6 @@ public class Booking {
 
     private static final String CSV_PATH = "src/file/booking/bookings.csv";
 
-    public Booking(String tenantId, String propertyId) {
-        this.tenantId = tenantId;
-        this.propertyId = propertyId;
-    }
-
     public Booking(String requestId, String tenantId, String propertyId, String status) {
         this.requestId = requestId;
         this.tenantId = tenantId;
