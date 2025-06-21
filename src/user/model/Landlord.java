@@ -4,6 +4,7 @@ import booking.model.Booking;
 import property.model.Property;
 import ui.helper.ImageUploader;
 
+import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -130,7 +131,8 @@ public class Landlord extends User {
         }
     }
 
-    public void postListing(String propertyName, String location, double price, boolean availability) {
+    // Updated postListing method that accepts a parent dialog
+    public void postListing(String propertyName, String location, double price, boolean availability, Dialog parent) {
         Property property = new Property();
         property.setPropertyId(UUID.randomUUID().toString());
         property.setLandlordId(getUserId());
@@ -141,10 +143,10 @@ public class Landlord extends User {
         property.setPrice(price);
         property.setAvailability(availability);
 
-        // Use callback approach
+        // Use callback approach with parent dialog
         final ImageUploader[] uploaderRef = new ImageUploader[1];
 
-        uploaderRef[0] = new ImageUploader(PROPERTY_IMAGE_PATH, () -> {
+        uploaderRef[0] = new ImageUploader(parent, PROPERTY_IMAGE_PATH, () -> {
             property.setImagePath(uploaderRef[0].getImagePath());
             property.saveToCsv();
             properties.add(property);
@@ -154,10 +156,148 @@ public class Landlord extends User {
         uploaderRef[0].setVisible(true);
     }
 
+    // Keep the old method for backward compatibility
+    public void postListing(String propertyName, String location, double price, boolean availability) {
+        postListing(propertyName, location, price, availability, null);
+    }
+
+    public void editListing(String propertyId, String propertyName, String location, double price, boolean availability, Dialog parent) {
+        File file = new File(PROPERTY_CSV_PATH);
+        if (!file.exists()) {
+            System.out.println("Property file does not exist.");
+            return;
+        }
+
+        List<String> updatedLines = new ArrayList<>();
+        boolean propertyFound = false;
+        String oldImagePath = null;
+        Property foundProperty = null;
+
+        for (Property prop : properties) {
+            if (prop.getPropertyId().equals(propertyId)) {
+                foundProperty = prop;
+                oldImagePath = prop.getImagePath();
+                break;
+            }
+        }
+
+        if (foundProperty == null) {
+            System.out.println("Property with id \"" + propertyId + "\" not found in memory.");
+            return;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            boolean isFirstLine = true;
+
+            while ((line = reader.readLine()) != null) {
+                if (isFirstLine) {
+                    updatedLines.add(line); // keep header
+                    isFirstLine = false;
+                    continue;
+                }
+
+                String[] parts = line.split(",");
+                if (parts.length >= 8 && parts[0].equals(propertyId)) {
+                    parts[1] = propertyName;
+                    parts[2] = location;
+                    parts[3] = String.valueOf(price);
+                    parts[4] = String.valueOf(availability);
+
+                    line = String.join(",", parts);
+                    propertyFound = true;
+                }
+                updatedLines.add(line);
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading properties file: " + e.getMessage());
+            return;
+        }
+
+        if (!propertyFound) {
+            System.out.println("Property with id \"" + propertyId + "\" not found in CSV file.");
+            return;
+        }
+
+        // Create a copy of the property with updated values for the callback
+        final Property propertyToUpdate = foundProperty;
+        final String finalOldImagePath = oldImagePath;
+        final List<String> finalUpdatedLines = new ArrayList<>(updatedLines);
+
+        final ImageUploader[] uploaderRef = new ImageUploader[1];
+
+        uploaderRef[0] = new ImageUploader(parent, PROPERTY_IMAGE_PATH, () -> {
+            String newImagePath = uploaderRef[0].getImagePath();
+
+            if (newImagePath != null && !newImagePath.isEmpty()) {
+                // Update the property object in memory
+                propertyToUpdate.setName(propertyName);
+                propertyToUpdate.setLocation(location);
+                propertyToUpdate.setPrice(price);
+                propertyToUpdate.setAvailability(availability);
+                propertyToUpdate.setImagePath(newImagePath);
+
+                // Update the CSV lines with the new image path
+                for (int i = 0; i < finalUpdatedLines.size(); i++) {
+                    String line = finalUpdatedLines.get(i);
+                    String[] parts = line.split(",");
+                    if (parts.length >= 8 && parts[0].equals(propertyId)) {
+                        parts[7] = newImagePath; // Update image path
+                        finalUpdatedLines.set(i, String.join(",", parts));
+                        break;
+                    }
+                }
+
+                // Write the updated lines back to the CSV file
+                try (FileWriter writer = new FileWriter(file, false)) {
+                    for (String updatedLine : finalUpdatedLines) {
+                        writer.write(updatedLine + System.lineSeparator());
+                    }
+
+                    // Delete the old image file if it exists and is different from the new one
+                    if (finalOldImagePath != null && !finalOldImagePath.isEmpty() &&
+                            !finalOldImagePath.equals(newImagePath)) {
+                        File oldImageFile = new File(finalOldImagePath);
+                        if (oldImageFile.exists()) {
+                            boolean deleted = oldImageFile.delete();
+                            if (!deleted) {
+                                System.err.println("Warning: Failed to delete old image file: " + finalOldImagePath);
+                            }
+                        }
+                    }
+
+                    System.out.println("Successfully updated property '" + propertyName + "' with new image.");
+
+                } catch (IOException e) {
+                    System.err.println("Error writing to properties file: " + e.getMessage());
+                }
+            } else {
+                System.out.println("No image was uploaded. Property details updated without changing image.");
+
+                // Still update the basic property details even if no new image was uploaded
+                propertyToUpdate.setName(propertyName);
+                propertyToUpdate.setLocation(location);
+                propertyToUpdate.setPrice(price);
+                propertyToUpdate.setAvailability(availability);
+
+                // Write the updated lines (without image path change) back to the CSV file
+                try (FileWriter writer = new FileWriter(file, false)) {
+                    for (String updatedLine : finalUpdatedLines) {
+                        writer.write(updatedLine + System.lineSeparator());
+                    }
+                    System.out.println("Successfully updated property details for: " + propertyName);
+                } catch (IOException e) {
+                    System.err.println("Error writing to properties file: " + e.getMessage());
+                }
+            }
+        });
+
+        uploaderRef[0].setVisible(true);
+    }
+
+    // Keep the old method for backward compatibility
     public void editListing(String propertyId, String propertyName, String location, double price, boolean availability) {
-        deleteListing(propertyId);
-        System.out.println("Please upload an image for the property");
-        postListing(propertyName, location, price, availability);
+        editListing(propertyId, propertyName, location, price, availability, null);
     }
 
     public void deleteListing(String propertyId) {
