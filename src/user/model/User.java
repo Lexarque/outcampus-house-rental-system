@@ -24,7 +24,7 @@ public abstract class User {
 
     public abstract void register(String name, String phone, String password);
 
-    protected abstract void login(String inputPhone, String inputPassword);
+    public abstract void login(String inputPhone, String inputPassword);
 
     public void logout() {
         System.out.println(name + " has logged out.");
