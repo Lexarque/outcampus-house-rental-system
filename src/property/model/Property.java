@@ -197,6 +197,10 @@ public class Property {
         return imagePath;
     }
 
+    public boolean getAvailability() {
+        return availability;
+    }
+
     // Operations
     @Override
     public String toString() {

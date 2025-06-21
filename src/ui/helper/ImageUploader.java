@@ -14,10 +14,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-public class ImageUploader extends JFrame {
+public class ImageUploader extends JDialog {  // Changed from JFrame to JDialog
 
     private String IMAGES_DIR = "";
-
     private String imagePath = "";
 
     // UI Components
@@ -28,13 +27,25 @@ public class ImageUploader extends JFrame {
     private JTextField imagePathField;
     private Runnable onCloseCallback;
 
-    public ImageUploader(String imagePath, Runnable onCloseCallback) {
+    // Updated constructor to accept parent Dialog
+    public ImageUploader(Dialog parent, String imagePath, Runnable onCloseCallback) {
+        super(parent, "Image Upload", true);  // Make it modal to the parent dialog
         this.onCloseCallback = onCloseCallback;
 
         IMAGES_DIR = imagePath;
+        setupUI();
+    }
 
-        setTitle("Image Upload");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    // Alternative constructor for Frame parent (for backward compatibility)
+    public ImageUploader(Frame parent, String imagePath, Runnable onCloseCallback) {
+        super(parent, "Image Upload", true);
+        this.onCloseCallback = onCloseCallback;
+
+        IMAGES_DIR = imagePath;
+        setupUI();
+    }
+
+    private void setupUI() {
         setLayout(new BorderLayout());
 
         // Create main panel
@@ -60,18 +71,18 @@ public class ImageUploader extends JFrame {
         mainPanel.add(imagePanel, BorderLayout.CENTER);
         mainPanel.add(pathPanel, BorderLayout.SOUTH);
 
-        // Add main panel to frame
+        // Add main panel to dialog
         add(mainPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // Set frame properties
+        // Set dialog properties
         setSize(400, 450);
-        setLocationRelativeTo(null); // Center on screen
+        setLocationRelativeTo(getParent()); // Center relative to parent
 
         // Ensure directories exist
         createDirectories();
 
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         addWindowListener(new WindowAdapter() {
             @Override
