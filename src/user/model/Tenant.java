@@ -4,14 +4,13 @@ import booking.model.Booking;
 import payment.model.Payment;
 import property.model.Property;
 
-import java.awt.print.Book;
 import java.io.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class Tenant extends  User {
+public class Tenant extends User {
     private List<Booking> bookings = new ArrayList<>();
     private List<Payment> payments = new ArrayList<>();
 
@@ -25,12 +24,14 @@ public class Tenant extends  User {
     public Tenant(User user) {
         super(user.getUserId(), user.getName(), user.getPhone(), user.getPassword(), user.getRole());
         setBookings();
+        setPayments(); // <-- Load payments too
         Payment.setPaymentHistory(getUserId(), payments);
     }
 
     // Operations
 
-    public List<Property> filterActivePropertyByPrice(List<Property> activeProperties, double minPrice, double maxPrice) {
+    public List<Property> filterActivePropertyByPrice(List<Property> activeProperties, double minPrice,
+            double maxPrice) {
         List<Property> filteredProperties = new ArrayList<>();
 
         for (Property property : activeProperties) {
@@ -69,8 +70,7 @@ public class Tenant extends  User {
                     name,
                     phone,
                     password,
-                    this.getClass().getSimpleName().toLowerCase()
-            ));
+                    this.getClass().getSimpleName().toLowerCase()));
             writer.newLine();
             writer.close();
 
@@ -104,7 +104,8 @@ public class Tenant extends  User {
                     String name = parts[1];
                     String role = parts[4];
 
-                    if ((phone.equals(inputPhone) && password.equals(inputPassword)) && role.equals(this.getClass().getSimpleName().toLowerCase())) {
+                    if ((phone.equals(inputPhone) && password.equals(inputPassword))
+                            && role.equals(this.getClass().getSimpleName().toLowerCase())) {
 
                         // Set authenticated user's details
                         setUserId(parts[0]);
@@ -114,6 +115,7 @@ public class Tenant extends  User {
                         setRole(parts[4]);
 
                         setBookings();
+                        setPayments(); // <-- Also load payments after login
 
                         System.out.println("Login successful. Welcome, " + name + "!");
 
@@ -132,7 +134,7 @@ public class Tenant extends  User {
         Booking booking = new Booking(UUID.randomUUID().toString(), this.getUserId(), propertyId, "pending");
         bookings.add(booking);
 
-        //Write to booking CSV
+        // Write to booking CSV
         booking.saveToCsv();
 
         System.out.println("Booking request sent for property ID: " + propertyId);
@@ -153,7 +155,7 @@ public class Tenant extends  User {
     private void setBookings() {
         File file = new File(BOOKING_CSV_PATH);
         if (!file.exists()) {
-            System.out.println("Properties not found.");
+            System.out.println("Bookings file not found.");
             return;
         }
 
@@ -182,10 +184,47 @@ public class Tenant extends  User {
         }
     }
 
+    // New method to load payments from CSV
+    private void setPayments() {
+        File file = new File(PAYMENT_CSV_PATH);
+        if (!file.exists()) {
+            System.out.println("Payments file not found.");
+            return;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            boolean isFirstLine = true;
+
+            while ((line = reader.readLine()) != null) {
+                if (isFirstLine) {
+                    isFirstLine = false; // skip header
+                    continue;
+                }
+
+                String[] parts = line.split(",");
+                if (parts.length >= 5) {
+                    String tenantId = parts[1];
+                    if (tenantId.equals(getUserId())) {
+                        String paymentId = parts[0];
+                        String propertyId = parts[2];
+                        double amount = Double.parseDouble(parts[3]);
+                        LocalDate date = LocalDate.parse(parts[4]);
+
+                        payments.add(new Payment(paymentId, tenantId, propertyId, amount, date));
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading from payment CSV: " + e.getMessage());
+        }
+    }
+
     public List<String> getAcceptedBookingPropertyIds() {
         List<String> acceptedPropertyIds = new ArrayList<>();
         for (Booking booking : bookings) {
-            if ("accepted".equalsIgnoreCase(booking.getStatus()) && !acceptedPropertyIds.contains(booking.getPropertyId())) {
+            if ("accepted".equalsIgnoreCase(booking.getStatus())
+                    && !acceptedPropertyIds.contains(booking.getPropertyId())) {
                 acceptedPropertyIds.add(booking.getPropertyId());
             }
         }
@@ -243,8 +282,7 @@ public class Tenant extends  User {
                     payment.getTenantId(),
                     payment.getPropertyId(),
                     String.valueOf(payment.getAmount()),
-                    payment.getDate().toString()
-            ));
+                    payment.getDate().toString()));
 
             writer.newLine();
 
@@ -256,4 +294,44 @@ public class Tenant extends  User {
             System.err.println("Error writing to payment CSV: " + e.getMessage());
         }
     }
+
+    public List<String> getOwnBookingSummaries() {
+        List<String> summaries = new ArrayList<>();
+
+        if (bookings == null || bookings.isEmpty()) {
+            return summaries;
+        }
+
+        for (Booking booking : bookings) {
+            String summary = String.format(
+                    "Booking ID: %s\nProperty ID: %s\nStatus: %s\n",
+                    booking.getRequestId(),
+                    booking.getPropertyId(),
+                    booking.getStatus());
+            summaries.add(summary);
+        }
+
+        return summaries;
+    }
+
+    public List<String> getOwnPaymentSummaries() {
+        List<String> summaries = new ArrayList<>();
+
+        if (payments == null || payments.isEmpty()) {
+            return summaries;
+        }
+
+        for (Payment payment : payments) {
+            // Customize this string to show relevant payment info
+            String summary = String.format("Payment ID: %s\nProperty ID: %s\nAmount: RM%.2f\nDate: %s\n",
+                    payment.getPaymentId(),
+                    payment.getPropertyId(),
+                    payment.getAmount(),
+                    payment.getDate().toString());
+            summaries.add(summary);
+        }
+
+        return summaries;
+    }
+
 }

@@ -5,6 +5,7 @@ import user.model.User;
 import user.view.admin.AdminMenu;
 import user.view.landlord.LandlordMenuGUI;
 import user.view.tenant.TenantMenu;
+import user.view.tenant.TenantMenuGUI;
 import utils.SessionManager;
 
 public class Main {
@@ -17,14 +18,16 @@ public class Main {
                 User currentUser = SessionManager.getCurrentUser();
 
                 switch (currentUser.getRole()) {
-                    case "admin" :
+                    case "admin":
                         AdminMenu.printAdminMenu();
-                    case "landlord" :
+                    case "landlord":
                         LandlordMenuGUI dialog = new LandlordMenuGUI(null);
                         dialog.setVisible(true);
                         break;
-                    case "tenant" :
-                        TenantMenu.printTenantMenu();
+                    case "tenant":
+                        TenantMenuGUI tenantDialog = new TenantMenuGUI(null);
+                        tenantDialog.setVisible(true);
+
                 }
             } else {
                 System.out.println("Authentication cancelled. Exiting.");
