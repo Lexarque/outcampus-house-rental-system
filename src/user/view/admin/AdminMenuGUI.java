@@ -6,20 +6,24 @@ import utils.SessionManager;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
-public class AdminMenuGUI extends JFrame {
+public class AdminMenuGUI extends JDialog {
     private final Admin admin;
 
-    public AdminMenuGUI() {
+    public AdminMenuGUI(Frame parent) {
+        super(parent, "Admin Panel", true);
         this.admin = SessionManager.setAdminData();
         initializeUI();
     }
 
     private void initializeUI() {
-        setTitle("Admin Panel");
         setSize(500, 450);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(getParent());
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         JButton viewUsersBtn = new JButton("View All Users");
         JButton viewPropertiesBtn = new JButton("View All Properties");
@@ -47,8 +51,8 @@ public class AdminMenuGUI extends JFrame {
 
     private void showAllUsers() {
         StringBuilder result = new StringBuilder("Registered Users:\n");
-
         File file = new File("src/file/user/users.csv");
+
         if (!file.exists()) {
             JOptionPane.showMessageDialog(this, "No users registered yet.");
             return;
@@ -88,13 +92,13 @@ public class AdminMenuGUI extends JFrame {
             return;
         }
 
-        try (
-                BufferedReader propReader = new BufferedReader(new FileReader(propertyFile));
+        try (BufferedReader propReader = new BufferedReader(new FileReader(propertyFile));
                 BufferedReader userReader = new BufferedReader(new FileReader(userFile))) {
-            // Map landlord ID to name
-            java.util.Map<String, String> landlordMap = new java.util.HashMap<>();
+
+            Map<String, String> landlordMap = new HashMap<>();
             String line;
             boolean isFirst = true;
+
             while ((line = userReader.readLine()) != null) {
                 if (isFirst) {
                     isFirst = false;
@@ -138,7 +142,7 @@ public class AdminMenuGUI extends JFrame {
             return;
 
         File file = new File("src/file/user/users.csv");
-        java.util.List<String> updatedLines = new java.util.ArrayList<>();
+        List<String> updatedLines = new ArrayList<>();
         boolean found = false;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -184,7 +188,7 @@ public class AdminMenuGUI extends JFrame {
             return;
 
         File file = new File("src/file/property/properties.csv");
-        java.util.List<String> updatedLines = new java.util.ArrayList<>();
+        List<String> updatedLines = new ArrayList<>();
         boolean found = false;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
