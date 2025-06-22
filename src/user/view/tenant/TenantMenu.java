@@ -13,6 +13,8 @@ public class TenantMenu {
     private final static Scanner scanner = new Scanner(System.in);
 
     public static void printTenantMenu() {
+        // This is a comment
+        // This is another comment
         while (true) {
             System.out.println();
             System.out.print("""

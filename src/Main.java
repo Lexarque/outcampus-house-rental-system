@@ -5,6 +5,7 @@ import user.model.User;
 import user.view.admin.AdminMenuGUI;
 import user.view.landlord.LandlordMenuGUI;
 import user.view.tenant.TenantMenu;
+import user.view.tenant.TenantMenuGUI;
 import utils.SessionManager;
 
 public class Main {
@@ -15,7 +16,6 @@ public class Main {
 
             if (authDialog.isLoginSuccessful()) {
                 User currentUser = SessionManager.getCurrentUser();
-
                 switch (currentUser.getRole().toLowerCase()) {
                     case "admin":
                         new AdminMenuGUI(null).setVisible(true);
