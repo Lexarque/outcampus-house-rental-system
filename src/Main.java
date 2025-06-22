@@ -2,7 +2,7 @@ import javax.swing.*;
 
 import auth.view.AuthenticationMenuGUI;
 import user.model.User;
-import user.view.admin.AdminMenu;
+import user.view.admin.AdminMenuGUI;
 import user.view.landlord.LandlordMenuGUI;
 import user.view.tenant.TenantMenu;
 import user.view.tenant.TenantMenuGUI;
@@ -16,18 +16,18 @@ public class Main {
 
             if (authDialog.isLoginSuccessful()) {
                 User currentUser = SessionManager.getCurrentUser();
-
-                switch (currentUser.getRole()) {
+                switch (currentUser.getRole().toLowerCase()) {
                     case "admin":
-                        AdminMenu.printAdminMenu();
+                        new AdminMenuGUI(null).setVisible(true);
+                        break;
                     case "landlord":
-                        LandlordMenuGUI dialog = new LandlordMenuGUI(null);
-                        dialog.setVisible(true);
+                        new LandlordMenuGUI(null).setVisible(true);
                         break;
                     case "tenant":
-                        TenantMenuGUI tenantDialog = new TenantMenuGUI(null);
-                        tenantDialog.setVisible(true);
-
+                        TenantMenu.printTenantMenu();
+                        break;
+                    default:
+                        JOptionPane.showMessageDialog(null, "Unknown user role: " + currentUser.getRole());
                 }
             } else {
                 System.out.println("Authentication cancelled. Exiting.");

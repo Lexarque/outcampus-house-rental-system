@@ -12,17 +12,17 @@ public class AdminMenu {
     public static void printAdminMenu() {
         while (true) {
             System.out.print("""
-                1. View All Users\
+                    1. View All Users\
 
-                2. View All Properties\
+                    2. View All Properties\
 
-                3. Remove a User\
-                
-                4. Deactivate a Property\
-                
-                5. Exit
-                
-                : \s""");
+                    3. Remove a User\
+
+                    4. Deactivate a Property\
+
+                    5. Exit
+
+                    : \s""");
 
             int option = Integer.parseInt(scanner.nextLine());
 
