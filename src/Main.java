@@ -4,7 +4,6 @@ import auth.view.AuthenticationMenuGUI;
 import user.model.User;
 import user.view.admin.AdminMenuGUI;
 import user.view.landlord.LandlordMenuGUI;
-import user.view.tenant.TenantMenu;
 import user.view.tenant.TenantMenuGUI;
 import utils.SessionManager;
 
@@ -25,7 +24,6 @@ public class Main {
                         break;
                     case "tenant":
                         new TenantMenuGUI(null).setVisible(true);
-                        break;
                         break;
                     default:
                         JOptionPane.showMessageDialog(null, "Unknown user role: " + currentUser.getRole());
