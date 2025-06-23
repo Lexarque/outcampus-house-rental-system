@@ -24,7 +24,8 @@ public class Main {
                         new LandlordMenuGUI(null).setVisible(true);
                         break;
                     case "tenant":
-                        TenantMenu.printTenantMenu();
+                        new TenantMenuGUI(null).setVisible(true);
+                        break;
                         break;
                     default:
                         JOptionPane.showMessageDialog(null, "Unknown user role: " + currentUser.getRole());
